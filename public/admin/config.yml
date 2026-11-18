@@ -4,7 +4,7 @@
 
 backend:
   name: github
-  repo: sameolcre/sameolcre-site
+  repo: sameolcre/sameolecre-site
   branch: main
   commit_messages:
     create: 'Add {{collection}} “{{slug}}”'
