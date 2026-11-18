@@ -9,7 +9,8 @@ services:
   - Logo system
   - Color & type
   - Brand guidelines
-summary: An identity system built around the paper wasp, set in industrial mono type with © and ® standing in for the C and R.
+summary: An identity system built around the paper wasp, set in industrial mono
+  type with © and ® standing in for the C and R.
 cover: /images/work/sameolcre-identity/cover.png
 gallery:
   - image: /images/work/sameolcre-identity/marks.png
@@ -22,7 +23,7 @@ gallery:
     caption: Off-white, black, Wasp Yellow
 featured: true
 order: 1
-draft: false
+draft: true
 ---
 
 ## The brief
