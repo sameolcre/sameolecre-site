@@ -16,8 +16,8 @@ backend:
 # Lets you use the CMS on your Mac without signing in: run `npm run cms` alongside `npm run dev`
 local_backend: true
 
-site_url: https://sameolcre.netlify.app
-display_url: https://sameolcre.netlify.app
+site_url: https://sameolcre.com
+display_url: https://sameolcre.com
 logo_url: /brand/wordmark_black.png
 
 media_folder: public/images/uploads
