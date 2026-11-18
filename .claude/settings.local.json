@@ -7,7 +7,18 @@
       "Bash(sips *)",
       "Bash(curl -s \"http://localhost:4322/src/styles/global.css\")",
       "Bash(python3 *)",
-      "Bash(pkill -f \"astro dev\")"
+      "Bash(pkill -f \"astro dev\")",
+      "Bash(node *)",
+      "Bash(sed -i '' \"s/a\\\\[href\\\\^=\\\\\"mailto:\\\\\"\\\\]/a.link/\" /tmp/cdp-hover.mjs)",
+      "Bash(sed -i '' \"s#/tmp/hover-real.png#/tmp/hover-card.png#\" /tmp/cdp-hover.mjs)",
+      "Bash(pkill -f \"remote-debugging-port\")",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(security find-internet-password *)",
+      "Bash(brew install *)",
+      "Bash(gh --version)",
+      "Bash(git remote *)",
+      "Bash(git push *)"
     ]
   }
 }
