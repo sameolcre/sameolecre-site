@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import JournalRow from '../../components/JournalRow.astro';
+import { getJournal } from '../../lib/utils';
+
+const items = await getJournal();
+const byYear = items.reduce<Record<string, typeof items>>((acc, it) => {
+  const y = String(it.date.getUTCFullYear());
+  (acc[y] ||= []).push(it);
+  return acc;
+}, {});
+const years = Object.keys(byYear).sort((a, b) => Number(b) - Number(a));
+const essays = items.filter((i) => i.kind === 'essay').length;
+const notes = items.length - essays;
+---
+<Base title="Journal" description="Essays, reflections and daily notes.">
+  <section class="wrap page-head">
+    <div class="meta label"><span>02 / Journal</span><span>{essays} essays — {notes} notes</span></div>
+    <h1 class="display">"Journal"</h1>
+    <p class="lede">Long-form essays and quick daily notes, in one running archive.</p>
+  </section>
+
+  <section class="wrap">
+    <div class="chips filter" role="group" aria-label="Filter entries">
+      <button class="chip" type="button" data-kind-filter="all" aria-pressed="true">All</button>
+      <button class="chip" type="button" data-kind-filter="essay" aria-pressed="false">Essays</button>
+      <button class="chip" type="button" data-kind-filter="note" aria-pressed="false">Notes</button>
+    </div>
+
+    {years.map((y) => (
+      <section class="year" data-year>
+        <h2 class="year-head"><span class="label label--muted">Year</span><span class="h2">{y}</span></h2>
+        {byYear[y].map((item) => <JournalRow item={item} />)}
+      </section>
+    ))}
+    {items.length === 0 && <p class="label label--muted">Nothing written yet.</p>}
+  </section>
+</Base>
+
+<script>
+  const btns = document.querySelectorAll<HTMLButtonElement>('[data-kind-filter]');
+  btns.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.kindFilter;
+      btns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      document.querySelectorAll<HTMLElement>('[data-kind]').forEach((row) => {
+        row.hidden = !(f === 'all' || row.dataset.kind === f);
+      });
+      document.querySelectorAll<HTMLElement>('[data-year]').forEach((sec) => {
+        sec.hidden = !sec.querySelector('[data-kind]:not([hidden])');
+      });
+    })
+  );
+</script>
+
+<style>
+  .filter { margin-bottom: 8px; }
+  .year { margin-top: 40px; }
+  .year-head { display: flex; align-items: baseline; gap: 16px; margin: 0; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+</style>

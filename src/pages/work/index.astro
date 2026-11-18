@@ -1,0 +1,55 @@
+---
+import Base from '../../layouts/Base.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import { getWork, slugify } from '../../lib/utils';
+
+const work = await getWork();
+const categories = [...new Set(work.map((w) => w.data.category))];
+---
+<Base title="Work" description="Selected projects in creative direction, branding, web development and digital media.">
+  <section class="wrap page-head">
+    <div class="meta label"><span>01 / Work</span><span>{work.length} {work.length === 1 ? 'project' : 'projects'}</span></div>
+    <h1 class="display">"Work"</h1>
+    <p class="lede">Case studies in creative direction, branding, web development and digital media.</p>
+  </section>
+
+  <section class="wrap">
+    {categories.length > 1 && (
+      <div class="chips filter" role="group" aria-label="Filter by category">
+        <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
+        {categories.map((c) => <button class="chip" type="button" data-filter={slugify(c)} aria-pressed="false">{c}</button>)}
+      </div>
+    )}
+    <hr class="rule" />
+    <div class="grid grid--3 list" id="work-list">
+      {work.map((entry, i) => <WorkCard entry={entry} index={i} />)}
+    </div>
+    {work.length === 0 && <p class="label label--muted">No projects yet — add one in the CMS.</p>}
+    <p class="label label--muted empty" hidden>No projects in this category yet.</p>
+  </section>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('#work-list [data-category]');
+  const empty = document.querySelector<HTMLElement>('.empty');
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      let shown = 0;
+      cards.forEach((c) => {
+        const match = f === 'all' || c.dataset.category === f;
+        c.hidden = !match;
+        if (match) shown++;
+      });
+      if (empty) empty.hidden = shown > 0;
+    })
+  );
+</script>
+
+<style>
+  .filter { margin-bottom: 20px; }
+  .list { margin-top: 32px; }
+  .empty { margin-top: 24px; }
+</style>

@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHead from '../components/SectionHead.astro';
+import WorkCard from '../components/WorkCard.astro';
+import JournalRow from '../components/JournalRow.astro';
+import settings from '../data/settings.json';
+import { getWork, getJournal, getProcess, formatDate } from '../lib/utils';
+
+const work = await getWork();
+const featured = (work.filter((w) => w.data.featured).length ? work.filter((w) => w.data.featured) : work).slice(0, 3);
+const journal = (await getJournal()).slice(0, 4);
+const process = (await getProcess()).slice(0, 3);
+---
+<Base>
+  <section class="hero wrap">
+    <p class="label label--muted hero-kicker">{settings.heroLabel}</p>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 class="display hero-headline">"{settings.heroHeadline}"</h1>
+        <p class="lede">{settings.intro}</p>
+        <div class="hero-cta">
+          <a class="btn" href="/work/">See the work ↗</a>
+          <a class="btn btn--ghost" href="/journal/">Read the journal</a>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="/brand/wasp-illustration.png" alt="" width="1326" height="1074" />
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule wrap hero-rule" />
+
+  <section class="section wrap">
+    <SectionHead num="01" title="Selected Work" href="/work/" linkLabel="All work" />
+    {featured.length
+      ? <div class="grid grid--3">{featured.map((entry, i) => <WorkCard entry={entry} index={i} />)}</div>
+      : <p class="label label--muted">No projects yet — add one in the CMS.</p>}
+  </section>
+
+  <section class="section wrap">
+    <SectionHead num="02" title="Journal" href="/journal/" linkLabel="Full archive" />
+    {journal.length
+      ? <div>{journal.map((item) => <JournalRow item={item} />)}</div>
+      : <p class="label label--muted">Nothing written yet.</p>}
+  </section>
+
+  {process.length > 0 && (
+    <section class="section wrap">
+      <SectionHead num="03" title="In Process" href="/process/" linkLabel="Process index" />
+      <div class="grid grid--3">
+        {process.map((p) => (
+          <a class="proc lift" href={`/process/${p.id}/`}>
+            <div class="proc-media">
+              {p.data.cover ? <img src={p.data.cover} alt="" loading="lazy" /> : <div class="ph"><img src="/brand/nest_black.svg" alt="" /></div>}
+            </div>
+            <div class="label proc-meta"><span>{p.data.status}</span><span>{formatDate(p.data.date)}</span></div>
+            <h3 class="h3">"{p.data.title}"</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .hero { padding-top: clamp(28px, 4vw, 48px); padding-bottom: clamp(40px, 6vw, 72px); }
+  .hero-kicker { margin-bottom: clamp(24px, 4vw, 40px); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 560px) 1fr; align-items: center; gap: clamp(32px, 6vw, 72px); }
+  .hero-copy, .hero-art { min-width: 0; }
+  .hero-headline { max-width: 13ch; font-size: clamp(34px, 4.6vw, 72px); }
+  .hero-headline + .lede { margin-top: 24px; max-width: 38ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .hero-art { display: flex; justify-content: center; }
+  .hero-art img { width: 100%; max-width: 620px; height: auto; }
+  /* .rule (global) sets margin: 0, which — at equal specificity and later
+     in source order — wins over .wrap's margin: 0 auto, so on viewports
+     wider than --max the rule hugs the left edge instead of centering. */
+  .hero-rule { margin: 0 auto; }
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 32px; }
+    .hero-art { order: -1; max-width: 280px; margin: 0 auto; }
+    .hero-art img { max-width: 280px; }
+  }
+  .proc { text-decoration: none; display: block; }
+  .proc-media { aspect-ratio: 4 / 3; border: 1px solid var(--ink); overflow: hidden; background: var(--soft); }
+  .proc-media > img { width: 100%; height: 100%; object-fit: cover; }
+  .proc-media .ph { border: 0; height: 100%; }
+  .proc-meta { display: flex; justify-content: space-between; border-bottom: 1px solid var(--ink); padding: 12px 0 8px; margin-bottom: 12px; }
+  .proc:hover .h3 { text-decoration: underline; }
+</style>

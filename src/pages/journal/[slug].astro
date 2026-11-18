@@ -1,0 +1,53 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getEssays, formatDate, readingTime } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const essays = await getEssays();
+  return essays.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, newer: essays[i - 1], older: essays[i + 1] },
+  }));
+}
+
+const { entry, newer, older } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+---
+<Base title={d.title} description={d.summary} image={d.cover} type="article">
+  <article>
+    <header class="wrap page-head">
+      <div class="meta label">
+        <a href="/journal/">← Journal</a>
+        <span><time datetime={d.date.toISOString()}>{formatDate(d.date)}</time> — {readingTime(entry.body)} min read</span>
+      </div>
+      <span class="label kind">Essay</span>
+      <h1 class="display essay-title">"{d.title}"</h1>
+      <p class="lede">{d.summary}</p>
+      {d.tags.length > 0 && <p class="label label--muted tags">{d.tags.map((t) => `#${t}`).join('  ')}</p>}
+    </header>
+
+    <div class="wrap">
+      {d.cover && <img class="cover" src={d.cover} alt="" />}
+      <div class="prose essay"><Content /></div>
+
+      <nav class="pager" aria-label="More essays">
+        {older ? <a href={`/journal/${older.id}/`}><span class="label label--muted">← Older</span><span class="h3">"{older.data.title}"</span></a> : <span></span>}
+        {newer && <a class="r" href={`/journal/${newer.id}/`}><span class="label label--muted">Newer →</span><span class="h3">"{newer.data.title}"</span></a>}
+      </nav>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .kind { display: inline-block; background: var(--ink); color: var(--paper); padding: 0 8px; margin-bottom: 20px; }
+  .essay-title { font-size: clamp(40px, 6vw, 96px); max-width: 16ch; }
+  .tags { margin-top: 20px; }
+  .cover { width: 100%; border: 1px solid var(--ink); margin-bottom: 56px; }
+  .essay { margin: 0 auto; }
+  .pager { display: flex; justify-content: space-between; gap: 24px; margin-top: 96px; padding-top: 24px; border-top: 2px solid var(--ink); }
+  .pager a { display: flex; flex-direction: column; gap: 6px; text-decoration: none; max-width: 45%; }
+  .pager a:hover .h3 { text-decoration: underline; }
+  .pager .r { text-align: right; margin-left: auto; }
+</style>

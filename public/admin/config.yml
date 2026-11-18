@@ -1,0 +1,168 @@
+# Decap CMS configuration — the dashboard lives at /admin
+# 1) Replace YOUR-GITHUB-USERNAME below with your GitHub username.
+# 2) Follow "Turn on the CMS" in README.md to connect GitHub sign-in on Netlify.
+
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/sameolcre-site
+  branch: main
+  commit_messages:
+    create: 'Add {{collection}} “{{slug}}”'
+    update: 'Update {{collection}} “{{slug}}”'
+    delete: 'Delete {{collection}} “{{slug}}”'
+    uploadMedia: 'Upload “{{path}}”'
+    deleteMedia: 'Delete “{{path}}”'
+
+# Lets you use the CMS on your Mac without signing in: run `npm run cms` alongside `npm run dev`
+local_backend: true
+
+site_url: https://sameolcre.netlify.app
+display_url: https://sameolcre.netlify.app
+logo_url: /brand/wordmark_black.png
+
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+collections:
+  # ---------- Quick daily notes ----------
+  - name: notes
+    label: Notes (daily)
+    label_singular: Note
+    description: Quick entries. A title is optional.
+    folder: src/content/notes
+    create: true
+    slug: '{{year}}-{{month}}-{{day}}-{{hour}}{{minute}}'
+    identifier_field: date
+    summary: '{{date}} — {{title}}'
+    sortable_fields: [date]
+    fields:
+      - { label: Date, name: date, widget: datetime }
+      - { label: Title (optional), name: title, widget: string, required: false }
+      - { label: Image (optional), name: image, widget: image, required: false }
+      - { label: Note, name: body, widget: markdown, buttons: [bold, italic, link, quote, bulleted-list], editor_components: [] }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+
+  # ---------- Long-form essays ----------
+  - name: essays
+    label: Essays
+    label_singular: Essay
+    folder: src/content/essays
+    create: true
+    slug: '{{slug}}'
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime }
+      - { label: Summary, name: summary, widget: text, hint: One or two sentences shown in lists and search results. }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+
+  # ---------- Portfolio ----------
+  - name: work
+    label: Work (case studies)
+    label_singular: Project
+    folder: src/content/work
+    create: true
+    slug: '{{slug}}'
+    sortable_fields: [order, year, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Client, name: client, widget: string, required: false }
+      - { label: Year, name: year, widget: number, value_type: int }
+      - label: Category
+        name: category
+        widget: select
+        options: [Creative Direction, Branding, Web Development, Digital Media]
+      - { label: Your role, name: role, widget: string, required: false }
+      - { label: Services, name: services, widget: list, required: false }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - label: Gallery
+        name: gallery
+        widget: list
+        required: false
+        fields:
+          - { label: Image, name: image, widget: image }
+          - { label: Caption, name: caption, widget: string, required: false }
+      - { label: Live link, name: link, widget: string, required: false }
+      - { label: Featured on home page, name: featured, widget: boolean, default: false }
+      - { label: Sort order (lower shows first), name: order, widget: number, value_type: int, default: 100 }
+      - { label: Case study, name: body, widget: markdown }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+
+  # ---------- Process ----------
+  - name: process
+    label: Process
+    label_singular: Process entry
+    folder: src/content/process
+    create: true
+    slug: '{{slug}}'
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime }
+      - { label: Status, name: status, widget: select, options: [In progress, Exploration, Archived], default: In progress }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - label: Images
+        name: images
+        widget: list
+        required: false
+        fields:
+          - { label: Image, name: image, widget: image }
+          - { label: Caption, name: caption, widget: string, required: false }
+      - { label: Notes, name: body, widget: markdown, required: false }
+      - { label: Draft, name: draft, widget: boolean, default: false }
+
+  # ---------- Pages & settings ----------
+  - name: pages
+    label: Pages & settings
+    files:
+      - label: About page
+        name: about
+        file: src/content/pages/about.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Intro, name: intro, widget: text }
+          - { label: Bio, name: body, widget: markdown }
+          - label: Services
+            name: services
+            widget: list
+            fields:
+              - { label: Service, name: title, widget: string }
+              - { label: Description, name: description, widget: text }
+          - label: Experience
+            name: experience
+            widget: list
+            required: false
+            fields:
+              - { label: Role, name: role, widget: string }
+              - { label: Organization, name: org, widget: string }
+              - { label: Years, name: years, widget: string }
+              - label: Description
+                name: description
+                widget: list
+                required: false
+                field: { label: Line, name: line, widget: string }
+          - { label: Clients, name: clients, widget: list, required: false }
+          - { label: Résumé (PDF), name: resume, widget: file, required: false }
+      - label: Site settings
+        name: settings
+        file: src/data/settings.json
+        fields:
+          - { label: Site name, name: siteName, widget: string }
+          - { label: Your name, name: owner, widget: string }
+          - { label: Tagline, name: tagline, widget: string }
+          - { label: Hero label (home page, above headline), name: heroLabel, widget: string }
+          - { label: Hero headline (home page), name: heroHeadline, widget: string }
+          - { label: Intro (home page + search results), name: intro, widget: text }
+          - { label: Email, name: email, widget: string }
+          - { label: Location, name: location, widget: string }
+          - label: Social links
+            name: socials
+            widget: list
+            fields:
+              - { label: Label, name: label, widget: string }
+              - { label: URL, name: url, widget: string }

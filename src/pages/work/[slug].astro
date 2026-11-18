@@ -1,0 +1,93 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getWork, pad } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const work = await getWork();
+  return work.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, index: i, next: work[(i + 1) % work.length] },
+  }));
+}
+
+const { entry, index, next } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const facts = [
+  ['Client', d.client],
+  ['Year', String(d.year)],
+  ['Role', d.role],
+  ['Category', d.category],
+].filter(([, v]) => v) as [string, string][];
+---
+<Base title={d.title} description={d.summary} image={d.cover} type="article">
+  <article>
+    <header class="wrap page-head">
+      <div class="meta label">
+        <a href="/work/">← All work</a>
+        <span>Case study {pad(index + 1)}</span>
+      </div>
+      <h1 class="display">"{d.title}"</h1>
+      <p class="lede">{d.summary}</p>
+    </header>
+
+    <div class="wrap">
+      <dl class="facts">
+        {facts.map(([k, v]) => (
+          <div><dt class="label label--muted">{k}</dt><dd>{v}</dd></div>
+        ))}
+        {d.services.length > 0 && (
+          <div><dt class="label label--muted">Services</dt><dd>{d.services.join(' / ')}</dd></div>
+        )}
+      </dl>
+
+      {d.cover && <img class="cover" src={d.cover} alt={`${d.title} — cover image`} />}
+
+      <div class="body">
+        <aside class="label label--muted side">
+          <span>"Overview"</span>
+          {d.link && <a class="btn btn--ghost visit" href={d.link} target="_blank" rel="noopener">Visit project ↗</a>}
+        </aside>
+        <div class="prose"><Content /></div>
+      </div>
+
+      {d.gallery.length > 0 && (
+        <section class="gallery" aria-label="Project images">
+          {d.gallery.map((g, i) => (
+            <figure>
+              <img src={g.image} alt={g.caption ?? `${d.title} image ${i + 1}`} loading="lazy" />
+              <figcaption class="label label--muted"><span>Fig. {pad(i + 1)}</span>{g.caption && <span>{g.caption}</span>}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )}
+
+      {next && next.id !== entry.id && (
+        <a class="next" href={`/work/${next.id}/`}>
+          <span class="label label--muted">Next project</span>
+          <span class="h2">"{next.data.title}" ↗</span>
+        </a>
+      )}
+    </div>
+  </article>
+</Base>
+
+<style>
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; margin: 0 0 40px; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+  .facts > div { padding: 16px 16px 16px 0; border-right: 1px solid var(--ink); }
+  .facts > div:last-child { border-right: 0; }
+  .facts > div + div { padding-left: 16px; }
+  dt { margin-bottom: 6px; }
+  dd { margin: 0; font-weight: 600; font-size: 17px; }
+  .cover { width: 100%; border: 1px solid var(--ink); }
+  .body { display: grid; grid-template-columns: 220px 1fr; gap: 32px; margin-top: 56px; }
+  .side { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 32px; margin-top: 72px; }
+  figure { margin: 0; }
+  figure img { width: 100%; border: 1px solid var(--ink); background: var(--soft); }
+  figcaption { display: flex; justify-content: space-between; gap: 16px; padding-top: 10px; }
+  .next { display: flex; flex-direction: column; gap: 10px; margin-top: 96px; padding: 32px 0; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); text-decoration: none; }
+  .next:hover .h2 { text-decoration: underline; }
+  @media (max-width: 860px) { .body { grid-template-columns: 1fr; gap: 16px; } .facts > div { border-right: 0; border-bottom: 1px solid var(--ink); padding-left: 0 !important; } }
+</style>

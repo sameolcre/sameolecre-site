@@ -1,0 +1,9 @@
+---
+interface Props { items: string[] }
+const { items } = Astro.props;
+---
+<div class="tape" aria-hidden="true">
+  <div class="tape__stripes"></div>
+  <div class="tape__text">{items.map((t) => <span>{t}</span>)}</div>
+  <div class="tape__stripes"></div>
+</div>

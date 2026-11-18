@@ -1,0 +1,52 @@
+---
+import settings from '../data/settings.json';
+const links = [
+  { href: '/work/', label: 'Work', n: '01' },
+  { href: '/journal/', label: 'Journal', n: '02' },
+  { href: '/process/', label: 'Process', n: '03' },
+  { href: '/about/', label: 'About', n: '04' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+<header class="site-header">
+  <div class="wrap bar">
+    <a href="/" class="brand" aria-label={`${settings.siteName} — home`}>
+      <img src="/brand/wordmark_black.png" alt="" width="231" height="34" />
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {links.map((l) => (
+          <li>
+            <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
+              <span class="n" aria-hidden="true">{l.n}</span>{l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { border-bottom: 2px solid var(--ink); background: var(--paper); position: sticky; top: 0; z-index: 5; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 32px; min-height: 72px; padding-top: 10px; padding-bottom: 10px; }
+  .brand { display: inline-flex; align-items: center; min-height: 44px; }
+  .brand img { height: 34px; width: auto; }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 28px; }
+  nav a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font-family: var(--mono); font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  nav a .n { color: var(--muted); font-size: 11px; }
+  nav a:hover { text-decoration: underline; }
+  nav a[aria-current='page'] { font-weight: 600; }
+  nav a[aria-current='page']::before { content: '"'; }
+  nav a[aria-current='page']::after { content: '"'; }
+  @media (max-width: 560px) {
+    .bar { min-height: 0; }
+    ul { gap: 0 18px; }
+    nav a .n { display: none; }
+  }
+</style>

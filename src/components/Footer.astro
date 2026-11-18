@@ -1,0 +1,55 @@
+---
+import settings from '../data/settings.json';
+import Tape from './Tape.astro';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <Tape items={['sameol©®e', `"${settings.tagline}"`, 'sameol©®e', '"Always under construction4"', 'sameol©®e']} />
+  <div class="wrap cols">
+    <div class="col brand">
+      <img src="/brand/wordmark_black.png" alt={settings.siteName} width="300" height="44" />
+      <p class="label label--muted brand-tagline">"{settings.tagline}"</p>
+    </div>
+    <div class="col">
+      <p class="label label--muted">"Index"</p>
+      <ul>
+        <li><a href="/work/">Work</a></li>
+        <li><a href="/journal/">Journal</a></li>
+        <li><a href="/process/">Process</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="label label--muted">"Contact"</p>
+      <ul>
+        <li><a href={`mailto:${settings.email}`}>{settings.email}</a></li>
+        {settings.socials.map((s) => <li><a href={s.url} rel="me noopener" target="_blank">{s.label} ↗</a></li>)}
+      </ul>
+    </div>
+    <div class="col">
+      <p class="label label--muted">"Elsewhere"</p>
+      <ul>
+        <li><a href="/rss.xml">RSS feed</a></li>
+        <li><span>{settings.location}</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap legal label">
+    <span>©{year} {settings.owner}</span>
+    <span>"{settings.siteName}"</span>
+    <span>Built with Astro</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: clamp(80px, 10vw, 160px); }
+  .cols { display: grid; grid-template-columns: 2fr repeat(3, 1fr); gap: 32px; padding-top: 48px; padding-bottom: 48px; }
+  .brand img { width: min(300px, 100%); height: auto; }
+  .brand-tagline { margin-top: 12px; }
+  ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; font-size: 16px; }
+  ul a { text-decoration: none; display: inline-block; padding: 4px 0; }
+  ul a:hover { text-decoration: underline; }
+  p { margin: 0; }
+  .legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; border-top: 2px solid var(--ink); padding-top: 16px; padding-bottom: 28px; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
+</style>

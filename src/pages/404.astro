@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Tape from '../components/Tape.astro';
+---
+<Base title="Not found">
+  <section class="wrap page-head nf">
+    <div class="meta label"><span>Error</span><span>404</span></div>
+    <h1 class="display">"Page not found"</h1>
+    <p class="lede">This cell of the nest is empty. Try the work or the journal instead.</p>
+    <div class="cta">
+      <a class="btn" href="/">Home</a>
+      <a class="btn btn--ghost" href="/work/">Work</a>
+      <a class="btn btn--ghost" href="/journal/">Journal</a>
+    </div>
+  </section>
+  <div class="mt-xl"><Tape items={['"Caution"', '404', '"Wrong turn"', '404', '"Caution"']} /></div>
+</Base>
+
+<style>
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+</style>

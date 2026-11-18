@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { pad, slugify } from '../lib/utils';
+interface Props { entry: CollectionEntry<'work'>; index: number }
+const { entry, index } = Astro.props;
+const d = entry.data;
+---
+<article class="card lift" data-category={slugify(d.category)}>
+  <a href={`/work/${entry.id}/`} class="link">
+    <div class="media">
+      {d.cover
+        ? <img src={d.cover} alt="" loading="lazy" />
+        : <div class="ph"><img src="/brand/wasp-side_black.svg" alt="" /></div>}
+    </div>
+    <div class="meta label">
+      <span>{pad(index + 1)}</span>
+      <span>{d.category}</span>
+      <span>{d.year}</span>
+    </div>
+    <h3 class="h3">"{d.title}"</h3>
+    <p class="summary">{d.summary}</p>
+    {d.draft && <p class="label draft">Draft — not published</p>}
+  </a>
+</article>
+
+<style>
+  .link { text-decoration: none; display: block; }
+  .media { aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--ink); background: var(--soft); }
+  .media > img { width: 100%; height: 100%; object-fit: cover; }
+  .media .ph { border: 0; height: 100%; }
+  .meta { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--ink); padding: 12px 0 8px; margin-bottom: 12px; }
+  .summary { margin: 8px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
+  .link:hover .h3 { text-decoration: underline; text-underline-offset: 4px; }
+  .draft { margin: 8px 0 0; display: inline-block; background: var(--yellow); padding: 2px 8px; }
+</style>

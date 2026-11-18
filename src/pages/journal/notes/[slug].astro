@@ -1,0 +1,37 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { getNotes, formatDate } from '../../../lib/utils';
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return notes.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const title = d.title ?? `Note — ${formatDate(d.date)}`;
+const description = (entry.body ?? '').replace(/[#*_>`\[\]]/g, '').slice(0, 155);
+---
+<Base title={title} description={description} image={d.image} type="article">
+  <article class="wrap note">
+    <div class="meta label">
+      <a href="/journal/">← Journal</a>
+      <time datetime={d.date.toISOString()}>{formatDate(d.date)}</time>
+    </div>
+    <span class="label kind">Note</span>
+    {d.title && <h1 class="h2">"{d.title}"</h1>}
+    {!d.title && <h1 class="sr-only">{title}</h1>}
+    {d.image && <img src={d.image} alt="" class="img" />}
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .note { padding-top: clamp(40px, 6vw, 88px); max-width: 860px; }
+  .meta { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); margin-bottom: 32px; }
+  .kind { display: inline-block; border: 1.5px solid var(--ink); padding: 0 8px; margin-bottom: 20px; }
+  h1.h2 { margin-bottom: 24px; }
+  .img { border: 1px solid var(--ink); margin-bottom: 28px; }
+</style>

@@ -1,0 +1,93 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import settings from '../data/settings.json';
+import { pad } from '../lib/utils';
+
+const page = await getEntry('pages', 'about');
+if (!page) throw new Error('Missing src/content/pages/about.md');
+const d = page.data;
+const { Content } = await render(page);
+---
+<Base title="About" description={d.intro}>
+  <section class="wrap page-head">
+    <div class="meta label"><span>04 / About</span><span>{settings.location}</span></div>
+    <h1 class="display">"{d.title}"</h1>
+    <p class="lede">{d.intro}</p>
+  </section>
+
+  <section class="wrap split">
+    <div class="prose"><Content /></div>
+    <aside class="brackets card">
+      <span class="br-b" aria-hidden="true"></span>
+      <img src="/brand/wasp-top_black.svg" alt="" width="200" height="210" class="wasp" />
+      <p class="label">"Contact"</p>
+      <p><a href={`mailto:${settings.email}`}>{settings.email}</a></p>
+      <ul>{settings.socials.map((s) => <li><a href={s.url} target="_blank" rel="me noopener">{s.label} ↗</a></li>)}</ul>
+      {d.resume && <a class="btn" href={d.resume} download>Download résumé</a>}
+    </aside>
+  </section>
+
+  {d.services.length > 0 && (
+    <section class="section wrap">
+      <div class="section-head"><div><span class="label label--muted num">A</span><h2 class="h2">"Services"</h2></div></div>
+      <ol class="services">
+        {d.services.map((s, i) => (
+          <li><span class="label">{pad(i + 1)}</span><h3 class="h3">{s.title}</h3><p>{s.description}</p></li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  {d.experience.length > 0 && (
+    <section class="section wrap">
+      <div class="section-head"><div><span class="label label--muted num">B</span><h2 class="h2">"Experience"</h2></div></div>
+      <ul class="exp">
+        {d.experience.map((x) => (
+          <li>
+            <div class="exp-row">
+              <span class="label label--muted">{x.years}</span>
+              <div>
+                <span class="role">{x.role}</span>
+                {x.description.map((line) => <p class="exp-desc">{line}</p>)}
+              </div>
+              <span>{x.org}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  {d.clients.length > 0 && (
+    <section class="section wrap">
+      <div class="section-head"><div><span class="label label--muted num">C</span><h2 class="h2">"Clients"</h2></div></div>
+      <p class="clients">{d.clients.join(' / ')}</p>
+    </section>
+  )}
+</Base>
+
+<style>
+  .split { display: grid; grid-template-columns: 1fr 360px; gap: clamp(32px, 5vw, 80px); align-items: start; }
+  .card { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .card p { margin: 0; }
+  .card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; justify-items: center; }
+  .wasp { width: 120px; margin-bottom: 8px; }
+  .services { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0; border-top: 0; }
+  .services li { padding: 20px 20px 28px 0; border-right: 1px solid var(--ink); }
+  .services li + li { padding-left: 20px; }
+  .services li:last-child { border-right: 0; }
+  .services p { margin: 10px 0 0; color: var(--muted); font-size: 16px; }
+  .services .h3 { margin-top: 12px; }
+  .exp { list-style: none; margin: 0; padding: 0; }
+  .exp li { padding: 16px 0; border-bottom: 1px solid var(--ink); }
+  .exp-row { display: grid; grid-template-columns: 180px 1fr 1fr; gap: 16px; }
+  .exp-desc { margin: 10px 0 0; color: var(--muted); font-size: 16px; max-width: 60ch; }
+  .role { font-weight: 700; }
+  .clients { font-size: clamp(22px, 2.6vw, 34px); font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; line-height: 1.2; margin: 0; }
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; }
+    .services li { border-right: 0; border-bottom: 1px solid var(--ink); padding-left: 0 !important; }
+    .exp-row { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>

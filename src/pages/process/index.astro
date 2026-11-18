@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getProcess, formatDate, pad } from '../../lib/utils';
+
+const items = await getProcess();
+---
+<Base title="Process" description="Sketches, experiments and work in development.">
+  <section class="wrap page-head">
+    <div class="meta label"><span>03 / Process</span><span>{items.length} entries</span></div>
+    <div class="head-row">
+      <h1 class="display">"Process"</h1>
+      <img src="/brand/nest_black.svg" alt="" class="nest" width="220" height="200" />
+    </div>
+    <p class="lede">Sketches, experiments, behind-the-scenes and ideas still being built.</p>
+  </section>
+
+  <section class="wrap">
+    <hr class="rule" />
+    <ol class="list">
+      {items.map((p, i) => (
+        <li>
+          <a href={`/process/${p.id}/`} class="item">
+            <span class="label num">{pad(items.length - i)}</span>
+            <div class="media">
+              {p.data.cover ? <img src={p.data.cover} alt="" loading="lazy" /> : <div class="ph"><img src="/brand/nest_black.svg" alt="" /></div>}
+            </div>
+            <div class="text">
+              <div class="label row"><span class="status" data-status={p.data.status}>{p.data.status}</span><span>{formatDate(p.data.date)}</span></div>
+              <h2 class="h3">"{p.data.title}"</h2>
+              <p>{p.data.summary}</p>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ol>
+    {items.length === 0 && <p class="label label--muted">No process entries yet.</p>}
+  </section>
+</Base>
+
+<style>
+  .head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+  .nest { width: clamp(100px, 14vw, 200px); height: auto; }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .item { display: grid; grid-template-columns: 56px minmax(0, 360px) 1fr; gap: 28px; padding: 28px 0; border-bottom: 1px solid var(--ink); text-decoration: none; align-items: start; }
+  .media { aspect-ratio: 4 / 3; border: 1px solid var(--ink); overflow: hidden; background: var(--soft); }
+  .media > img { width: 100%; height: 100%; object-fit: cover; }
+  .media .ph { border: 0; height: 100%; }
+  .row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .status { padding: 0 8px; border: 1.5px solid var(--ink); }
+  .status[data-status='In progress'] { background: var(--yellow); }
+  .text p { margin: 10px 0 0; color: var(--muted); max-width: 56ch; }
+  .item:hover .h3 { text-decoration: underline; }
+  @media (max-width: 760px) { .item { grid-template-columns: 1fr; gap: 14px; } }
+</style>

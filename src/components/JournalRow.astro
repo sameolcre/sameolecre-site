@@ -1,0 +1,51 @@
+---
+import { render } from 'astro:content';
+import type { JournalItem } from '../lib/utils';
+import { formatDate, readingTime } from '../lib/utils';
+interface Props { item: JournalItem }
+const { item } = Astro.props;
+const isEssay = item.kind === 'essay';
+const href = isEssay ? `/journal/${item.entry.id}/` : `/journal/notes/${item.entry.id}/`;
+let Content: any = null;
+if (!isEssay) ({ Content } = await render(item.entry));
+---
+<article class={`row ${item.kind}`} data-kind={item.kind}>
+  <div class="when label">
+    <time datetime={item.date.toISOString()}>{formatDate(item.date)}</time>
+    <span class="kind">{isEssay ? 'Essay' : 'Note'}</span>
+  </div>
+  <div class="body">
+    {isEssay ? (
+      <>
+        <h3 class="h3"><a href={href}>"{item.entry.data.title}"</a></h3>
+        <p class="summary">{(item.entry.data as any).summary}</p>
+        <p class="label label--muted">{readingTime(item.entry.body)} min read</p>
+      </>
+    ) : (
+      <>
+        {item.entry.data.title && <h3 class="note-title"><a href={href}>{item.entry.data.title}</a></h3>}
+        {(item.entry.data as any).image && <img src={(item.entry.data as any).image} alt="" loading="lazy" class="note-img" />}
+        <div class="note-text">{Content && <Content />}</div>
+        <a class="label label--muted permalink" href={href}>Permalink</a>
+      </>
+    )}
+  </div>
+</article>
+
+<style>
+  .row { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--ink); }
+  .when { display: flex; flex-direction: column; gap: 4px; }
+  .kind { display: inline-block; width: fit-content; padding: 0 8px; border: 1.5px solid var(--ink); }
+  .essay .kind { background: var(--ink); color: var(--paper); }
+  .h3 a, .note-title a { text-decoration: none; }
+  .h3 a:hover, .note-title a:hover { text-decoration: underline; }
+  .summary { margin: 8px 0 8px; font-size: 17px; max-width: 62ch; }
+  .note-title { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+  .note-text { max-width: 62ch; font-size: 17px; }
+  .note-text :global(p) { margin: 0 0 0.6em; }
+  .note-img { max-width: 420px; border: 1px solid var(--ink); margin-bottom: 12px; }
+  .permalink { text-decoration: none; }
+  .permalink:hover { text-decoration: underline; }
+  p.label { margin: 0; }
+  @media (max-width: 720px) { .row { grid-template-columns: 1fr; gap: 10px; } .when { flex-direction: row; gap: 12px; align-items: center; } }
+</style>

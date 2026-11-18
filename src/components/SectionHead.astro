@@ -1,0 +1,16 @@
+---
+interface Props { num: string; title: string; href?: string; linkLabel?: string }
+const { num, title, href, linkLabel = 'View all' } = Astro.props;
+---
+<div class="section-head">
+  <div>
+    <span class="label label--muted num">{num}</span>
+    <h2 class="h2">"{title}"</h2>
+  </div>
+  {href && (
+    <a class="label" href={href}>
+      {linkLabel}
+      <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 L13 3 M5 3 H13 V11" stroke="currentColor" stroke-width="2" fill="none" /></svg>
+    </a>
+  )}
+</div>
