@@ -14,7 +14,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
     <a href="/" class="brand" aria-label={`${settings.siteName} — home`}>
       <img src="/brand/wordmark_black.png" alt="" width="231" height="34" />
     </a>
-    <nav aria-label="Main">
+    <nav aria-label="Main" id="main-nav">
       <ul>
         {links.map((l) => (
           <li>
@@ -25,8 +25,40 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
         ))}
       </ul>
     </nav>
+    <button type="button" class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('main-nav');
+
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle('open', open);
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      if (nav.classList.contains('open') && !nav.contains(target) && !toggle.contains(target)) {
+        setOpen(false);
+      }
+    });
+  }
+</script>
 
 <style>
   .site-header { border-bottom: 2px solid var(--ink); background: var(--paper); position: sticky; top: 0; z-index: 5; }
@@ -44,9 +76,56 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
   nav a[aria-current='page'] { font-weight: 600; }
   nav a[aria-current='page']::before { content: '"'; }
   nav a[aria-current='page']::after { content: '"'; }
-  @media (max-width: 560px) {
-    .bar { min-height: 0; }
-    ul { gap: 0 18px; }
-    nav a .n { display: none; }
+
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--ink);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-toggle.open span:nth-child(2) { opacity: 0; }
+  .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  @media (max-width: 640px) {
+    .menu-toggle { display: flex; }
+    nav[aria-label='Main'] {
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: 0;
+      overflow: hidden;
+      visibility: hidden;
+      background: var(--paper);
+      border-bottom: 0 solid var(--ink);
+      transition: max-height 0.3s ease, border-bottom-width 0.3s ease, visibility 0s linear 0.3s;
+    }
+    nav[aria-label='Main'].open {
+      max-height: 320px;
+      border-bottom-width: 2px;
+      visibility: visible;
+      transition: max-height 0.3s ease, border-bottom-width 0.3s ease, visibility 0s linear 0s;
+    }
+    nav[aria-label='Main'] ul { flex-direction: column; gap: 0; padding: 8px var(--gutter) 12px; }
+    nav[aria-label='Main'] li { border-bottom: 1px solid var(--ink); }
+    nav[aria-label='Main'] li:last-child { border-bottom: 0; }
+    nav[aria-label='Main'] a { min-height: 56px; width: 100%; }
+    nav[aria-label='Main'] a .n { display: inline; }
   }
 </style>
